@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Event {
+  id              String   @id                // Polymarket condition_id
+  slug            String   @unique
+  title           String
+  description     String
+  category        String                      // politics, crypto, sports...
+  imageUrl        String?
+  
+  // Market data
+  marketProb      Float                       // Probability from Polymarket (0-1)
+  volume          Float?                      // Trading volume
+  endDate         DateTime?
+  
+  // Cloracle data
+  cloracleProb    Float?                      // Our probability estimate
+  cloracleReason  String?                     // Reasoning (markdown)
+  confidence      String?                     // low, medium, high
+  analyzedAt      DateTime?
+  
+  // Meta
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  isActive        Boolean  @default(true)
+  
+  predictions     Prediction[]
+}
+
+model Prediction {
+  id          String   @id @default(cuid())
+  eventId     String
+  probability Float
+  reasoning   String
+  confidence  String   @default("medium")
+  createdAt   DateTime @default(now())
+  
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  role      String                           // user or assistant
+  content   String
+  eventId   String?                          // Optional: related event
+  createdAt DateTime @default(now())
+}
