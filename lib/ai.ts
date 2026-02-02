@@ -157,6 +157,13 @@ Provide a detailed, specific answer. If discussing probability, give your OWN es
     }
   } catch (error) {
     console.error('Chat failed:', error)
+    const msg = error instanceof Error ? error.message : String(error)
+    if (!process.env.GEMINI_API_KEY?.trim()) {
+      return { content: 'Error: GEMINI_API_KEY is not set. Add it in Railway Variables.' }
+    }
+    if (msg.includes('API key') || msg.includes('quota') || msg.includes('429')) {
+      return { content: 'Error: Gemini API limit or invalid key. Check your API key and quota.' }
+    }
     return {
       content: `Error: Unable to process your request at the moment. Please try again later.`
     }
