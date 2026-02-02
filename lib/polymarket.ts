@@ -146,12 +146,12 @@ interface GammaMarket {
 export async function fetchGammaEvents(limit = 50, offset = 0): Promise<GammaEvent[]> {
   try {
     const response = await fetch(
-      `${GAMMA_API_BASE}/events?limit=${limit}&offset=${offset}&active=true&closed=false&archived=false`,
+      `${GAMMA_API_BASE}/events?limit=${limit}&offset=${offset}&active=true&closed=false`,
       {
         headers: {
           'Accept': 'application/json',
         },
-        next: { revalidate: 300 }
+        cache: 'no-store'
       }
     )
     
